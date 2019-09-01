@@ -1,0 +1,82 @@
+---
+title: "SAWS_upwelling"
+author: "Amieroh Abrahams"
+date: "29 August 2019"
+output: html_document
+---
+
+# Upwelling
+  # Script for the forecasting data obtained from the SAWS
+  # This script extracts the netCDF wind data and use it accordingly for the aim to calculate upwelling indeces
+
+Upwelling is primarily caused by alongshore, equator ward winds. These winds are caused by cross-shore atmospheric pressure gradients, and these gradients occur predominantly during heating periods. Upwelling is defined as the process whereby cold, nutrient rich, high concentrated CO2, low pH, and low oxygenated waters are pushed to the surface as a result of alongshore winds interacting with the earth’s rotation.
+
+# Upwelling indeces
+  # Determining upwelling index from wind data (SAWS)
+  # Index Equation from Fielding & Davis 1989 paper
+
+$$ UpwellingIndex = μ{(Cosθ − 160)}$$
+
+In this equation μ represents the wind speed (m/s) and θ represents the wind direction which is measured in degrees. The 160 degrees is used as this refers to the angle of the coastline. This equation is largely dependant on wind speed and direction data in order to determing the intensity of the upwelling event. Wind data were obtained daily from the South African Weather Service (SAWS). This wind data was then matched to the date at which temperature were collected. With this data the upwelling index was determined.
+
+# Load libraries
+
+```{r}
+library(ncdf4) # package for netcdf manipulation
+library(raster) # package for raster manipulation
+library(rgdal) # package for geospatial analysis
+library(ggplot2) # package for plotting
+```
+
+
+
+```{r}
+nc_data <- nc_open('SA4_00Z_OPS_20190829_SUBSET.nc')
+attributes(nc_data$var)
+# "leadtime", "longitude_bnds", "latitude_bnds", "x_wind", "y_wind", "air_pressure_at_sea_level"
+
+print(nc_data)
+
+# Save the print(nc) dump to a text file
+{
+    sink('SA4_00Z_OPS_20190829_SUBSET.txt')
+ print(nc_data)
+    sink()
+}
+
+
+lon <- ncvar_get(nc_data, "longitude_bnds")
+lat <- ncvar_get(nc_data, "latitude_bnds", verbose = F)
+print(c(nlon, nlat))
+t <- ncvar_get(nc_data, "leadtime")
+x_wind <- ncvar_get(nc_data, "x_wind")
+y_wind <- ncvar_get(nc_data, "y_wind")
+
+nc.brick <- brick(file.choose())
+dim(nc.brick)
+nc.df <- as.data.frame(nc.brick)
+
+head(nc.df)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
